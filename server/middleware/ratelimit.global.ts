@@ -4,8 +4,6 @@ import { Redis } from "@upstash/redis";
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.cachedFixedWindow(10, "10s"),
-  ephemeralCache: new Map(),
-  analytics: true,
 });
 
 export default eventHandler(async (e) => {
@@ -16,9 +14,9 @@ export default eventHandler(async (e) => {
   const { success, limit, remaining, reset } = await ratelimit.limit(ip ?? "anonymous");
 
   setHeaders(e, {
-    "X-RateLimit-Limit": limit.toString(),
-    "X-RateLimit-Remaining": remaining.toString(),
-    "X-RateLimit-Reset": reset.toString(),
+    "x-ratelimit-limit": limit.toString(),
+    "x-ratelimit-remaining": remaining.toString(),
+    "x-ratelimit-reset": reset.toString(),
   });
 
   if (!success) {
